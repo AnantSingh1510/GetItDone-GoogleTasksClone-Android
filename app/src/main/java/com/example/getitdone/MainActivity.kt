@@ -2,7 +2,6 @@ package com.example.getitdone
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -15,16 +14,17 @@ import com.example.getitdone.databinding.ActivityMainBinding
 import com.example.getitdone.databinding.DialogAddtaskBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var database: GetItDoneDatabase
     private val taskDao: TaskDao by lazy { database.getTaskDao() }
+    private val tasksFragment: TasksFragment = TasksFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -43,18 +43,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAddTaskDialog() {
         val dialogBinding = DialogAddtaskBinding.inflate(layoutInflater)
-//        MaterialAlertDialogBuilder(this)
-//            .setTitle("Add new task")
-//            .setView(dialogBinding.root)
-//            .setPositiveButton("Save") { _, _ ->
-//                Toast.makeText(
-//                    this,
-//                    "Your task is ${dialogBinding.editText.text}",
-//                    Toast.LENGTH_LONG
-//                ).show()
-//            }
-//            .setNegativeButton("Cancel", null)
-//            .show()
 
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(dialogBinding.root)
@@ -71,7 +59,12 @@ class MainActivity : AppCompatActivity() {
                 title = dialogBinding.editTextTaskDetails.text.toString(),
                 description = dialogBinding.editTextTaskDetails.text.toString()
             )
-            taskDao.createTask(task)
+            thread {
+                taskDao.createTask(task)
+            }
+
+            tasksFragment.fetchAllTasks()
+            dialog.dismiss()
         }
 
         dialog.show()
@@ -81,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount() = 1
 
         override fun createFragment(position: Int): Fragment {
-            return TasksFragment()
+            return tasksFragment
         }
 
     }

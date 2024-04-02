@@ -1,5 +1,6 @@
 package com.example.getitdone.Entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -12,5 +13,10 @@ data class Task(
     val title: String,
 
     val description: String? = null,
-    val isStarred: Boolean = false
+
+    @ColumnInfo(name = "is_starred")
+    val isStarred: Boolean = false,
+
+    @ColumnInfo(name = "is_completed")
+    val isCompeted: Boolean = false
 )

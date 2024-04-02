@@ -22,7 +22,9 @@ abstract class GetItDoneDatabase : RoomDatabase() {
                     context,
                     GetItDoneDatabase::class.java,
                     "get-it-done-datatbase"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 DATABASE_INSTANCE = instance
                 instance
             }
